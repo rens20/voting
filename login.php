@@ -14,16 +14,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $validate = $user['type'];
         $user_id = $user['id'];
 
+        $_SESSION['id'] = $user_id;
+
         if ($validate == 'admin') {
-            $_SESSION['token'] = $validate;
+            $_SESSION['token'] = 'admin';
             header("Location: ./public/admin.php");
             exit();
+        } elseif ($validate == 'admin1') {
+            $_SESSION['token'] = 'admin1';
+            header("Location: register.php");
+            exit();
         } elseif ($validate == 'user') {
-            $_SESSION['token'] = $validate;
+            $_SESSION['token'] = 'user';
             header("Location: ./public/user.php?user_id=$user_id");
             exit();
         } else {
-            echo "Invalid user type"; 
+            echo "Invalid user type";
         }
     }
 }
