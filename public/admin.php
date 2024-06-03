@@ -160,13 +160,16 @@ foreach ($voters as $voter) {
     $officerVotes[$officer] += $voteCounter;
 }
 
-// Calculate percentage for each officer based on a total of 5000 votes for candidates like President, PIO, Vice President, etc.
-$totalVotes = 5000;
-$officerPercentages = [];
-foreach ($officerVotes as $officer => $votes) {
-    $percentage = ($votes / $totalVotes) * 100;
-    $officerPercentages[$officer] = $percentage;
+// Calculate total votes for each officer
+$totalOfficerVotes = [];
+foreach ($groupedVoters as $officer => $officerVoters) {
+    $totalVotes = 0;
+    foreach ($officerVoters as $voter) {
+        $totalVotes += $voter['vote_counter'];
+    }
+    $totalOfficerVotes[$officer] = $totalVotes;
 }
+
 
 ?>
 <!DOC
@@ -191,6 +194,8 @@ foreach ($officerVotes as $officer => $votes) {
     <div class="flex justify-between items-center">
         <h1 class="text-3xl font-bold mb-4">Admin Panel</h1>
         <a href="../index.php" class="text-black font-bold ml-auto">Logout</a>
+        <a href="../register.php" class="text-black font-bold ml-6">Register</a>
+
     </div>
     <form action="" method="get" class="mb-6" enctype="multipart/form-data">
         <div class="flex mb-4">
@@ -222,6 +227,9 @@ foreach ($officerVotes as $officer => $votes) {
     </form>
     <?php foreach ($groupedVoters as $officer => $voters): ?>
         <h2 class="text-xl font-bold mb-4"><?php echo $officer; ?></h2>
+       <div class="text-gray-700 mb-4">
+                    Vote Percentage: <?php echo $totalOfficerVotes[$officer] > 0 ? round(($totalOfficerVotes[$officer] / array_sum($totalOfficerVotes)) * 100, 2) : 0; ?>%
+                </div>
         <table class="min-w-full bg-white border border-gray-300 mb-6">
             
             <thead>
@@ -230,7 +238,7 @@ foreach ($officerVotes as $officer => $votes) {
                     <th class="py-2 px-4 border-b">Officer</th>
                     <th class="py-2 px-4 border-b">Grade</th>
                     <th class="py-2 px-4 border-b">Section</th>
-                    <th class="py-2 px-4 border-b">Motto</th>
+                    <!-- <th class="py-2 px-4 border-b">Motto</th> -->
                     <th class="py-2 px-4 border-b">Vote Counter</th>
                      <th class="py-2 px-4 border-b">Percentage of Votes</th>
                     <th class="py-2 px-4 border-b">Image</th>
@@ -244,7 +252,7 @@ foreach ($officerVotes as $officer => $votes) {
                         <td class="py-2 px-4 border-b"><?php echo $voter['officer']; ?></td>
                         <td class="py-2 px-4 border-b"><?php echo $voter['grade']; ?></td>
                         <td class="py-2 px-4 border-b"><?php echo $voter['section']; ?></td>
-                        <td class="py-2 px-4 border-b"><?php echo $voter['motto']; ?></td>
+                        
                         <td class="py-2 px-4 border-b"><?php echo $voter['vote_counter']; ?></td>
                          <td class="py-2 px-4 border-b"><?php echo number_format(($voter['vote_counter'] / 5000) * 100, 2) . '%'; ?></td>
                         <td class="py-2 px-4 border-b">

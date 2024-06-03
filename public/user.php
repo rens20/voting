@@ -4,10 +4,9 @@ require_once(__DIR__ . '/../config/validation.php');
 
 session_start();
 if (!isset($_SESSION['token']) || $_SESSION['token'] !== 'user') {
-    header("Location: ../login.php"); // Redirect to login if not logged in as a user
+    header("Location: ../login.php"); 
     exit();
 }
-
 require_once('connection.php');
 
 // Fetch voters from the database
@@ -49,10 +48,11 @@ if (isset($_SESSION['id'])) {
                 <h1 class="text-white text-2xl font-bold ml-4">Kasiglahan Village National High School</h1>
             </div>
             <a href="../index.php" class="text-white">Logout</a>
+            
         </div>
     </div>
 </header>
-<p class="text-gray-600 font-semibold">Welcome, <?php echo $email; ?></p>
+<p class="text-gray-600 font-semibold text-center text-3xl">Welcome, <?php echo $email; ?></p>
 <div class="container mx-auto px-4 py-8">
     <form id="votingForm">
     <?php
@@ -87,7 +87,7 @@ if (isset($_SESSION['id'])) {
                             <p class="text-gray-700">Officer: <?php echo htmlspecialchars($voter['officer']); ?></p>
                             <p class="text-gray-700">Grade: <?php echo htmlspecialchars($voter['grade']); ?></p>
                             <p class="text-gray-700">Section: <?php echo htmlspecialchars($voter['section']); ?></p>
-                            <p class="text-gray-700">Motto: <?php echo htmlspecialchars($voter['motto']); ?></p>
+                           <p class="text-gray-700">Motto: <?php echo htmlspecialchars($voter['motto']); ?></p>
                         </div>
                         <div class="px-6 py-4 bg-blue-500 border-t border-gray-200 text-center">
                             <label>
