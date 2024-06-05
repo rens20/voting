@@ -228,7 +228,7 @@ foreach ($groupedVoters as $officer => $officerVoters) {
     <?php foreach ($groupedVoters as $officer => $voters): ?>
         <h2 class="text-xl font-bold mb-4"><?php echo $officer; ?></h2>
        <div class="text-gray-700 mb-4">
-                    Vote Percentage: <?php echo $totalOfficerVotes[$officer] > 0 ? round(($totalOfficerVotes[$officer] / array_sum($totalOfficerVotes)) * 100, 2) : 0; ?>%
+                    Voters 10 
                 </div>
         <table class="min-w-full bg-white border border-gray-300 mb-6">
             
@@ -254,8 +254,16 @@ foreach ($groupedVoters as $officer => $officerVoters) {
                         <td class="py-2 px-4 border-b"><?php echo $voter['section']; ?></td>
                         
                         <td class="py-2 px-4 border-b"><?php echo $voter['vote_counter']; ?></td>
-                         <td class="py-2 px-4 border-b"><?php echo number_format(($voter['vote_counter'] / 5000) * 100, 2) . '%'; ?></td>
+      <td class="px-4 py-2 border-b">
+                            <?php
+                            $officer = $voter['officer'];
+                            $totalVotes = isset($totalOfficerVotes[$officer]) ? $totalOfficerVotes[$officer] : 0;
+                            $percentage = $totalVotes > 0 ? ($voter['vote_counter'] / 10) * 100 : 0;
+                            echo number_format($percentage, 2) . '%';
+                            ?>
+                        </td>
                         <td class="py-2 px-4 border-b">
+                      
                             <?php if (!empty($voter['image'])): ?>
                                 <img src="<?php echo $voter['image']; ?>" class="table-image" alt="Voter Image">
                             <?php else: ?>
