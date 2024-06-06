@@ -82,7 +82,8 @@ if (isset($_SESSION['id'])) {
                 <?php foreach ($voters as $voter): ?>
                     <div class="bg-white shadow-md rounded-lg overflow-hidden">
                         <div class="px-6 py-4">
-                            <img src="<?php echo htmlspecialchars($voter['image']); ?>" alt="Voter Image" class="w-full h-48 object-cover object-center">
+                           <img src="<?php echo htmlspecialchars($voter['image']); ?>" alt="Voter Image" class="w-full h-auto object-cover object-center">
+
                             <h3 class="text-lg font-semibold mb-2 text-center"><?php echo htmlspecialchars($voter['name']); ?></h3>
                             <p class="text-gray-700">Officer: <?php echo htmlspecialchars($voter['officer']); ?></p>
                             <p class="text-gray-700">Grade: <?php echo htmlspecialchars($voter['grade']); ?></p>

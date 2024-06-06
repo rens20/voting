@@ -117,13 +117,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['search'])) {
 function fetchAllVoters() {
     global $conn;
     try {
-        $stmt = $conn->query("SELECT id, name, officer, grade, section, motto, vote_counter, image FROM voters");
+        $stmt = $conn->query("SELECT id, name, officer, grade, section, motto, vote_counter, image FROM voters ORDER BY vote_counter DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
         return [];
     }
 }
+
 
 function searchVoters($searchQuery) {
     global $conn;
@@ -139,15 +140,6 @@ function searchVoters($searchQuery) {
     }
 }
 
-// Group voters by officer role
-$groupedVoters = [];
-foreach ($voters as $voter) {
-    $officer = $voter['officer'];
-    if (!isset($groupedVoters[$officer])) {
-        $groupedVoters[$officer] = [];
-    }
-    $groupedVoters[$officer][] = $voter;
-}
 
 // Calculate percentage of votes for each officer
 $officerVotes = [];
@@ -158,6 +150,16 @@ foreach ($voters as $voter) {
         $officerVotes[$officer] = 0;
     }
     $officerVotes[$officer] += $voteCounter;
+}
+
+// Group voters by officer role
+$groupedVoters = [];
+foreach ($voters as $voter) {
+    $officer = $voter['officer'];
+    if (!isset($groupedVoters[$officer])) {
+        $groupedVoters[$officer] = [];
+    }
+    $groupedVoters[$officer][] = $voter;
 }
 
 // Calculate total votes for each officer
@@ -205,26 +207,60 @@ foreach ($groupedVoters as $officer => $officerVoters) {
         </div>
     </form>
     <form action="" method="post" class="mb-6" enctype="multipart/form-data">
-        <input type="hidden" name="id" value="">
-        <input type="text" name="name" placeholder="Enter name" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
-        <input type="text" name="grade" placeholder="Grade" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
-        <input type="text" name="section" placeholder="Section" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
-        <input type="text" name="motto" placeholder="Motto" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
-        <select name="officer" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
-            <option value="President">President</option>
-            <option value="Vice President">Vice President</option>
-            <option value="PIO">PIO</option>
-            <option value="Secretary">Secretary</option>
-            <option value="Auditor">Auditor</option>
-            <option value="Treasurer">Treasurer</option>
-            <option value="Author">Author</option>
-            <option value="Protocol officers">Protocol officers</option>
-            <option value="Representative">Representative</option>
-        </select>
-        <input type="file" name="image" accept="image/*" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
-        <button type="submit" name="insert" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-blue-600">Insert</button>
-        <button type="submit" name="update" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Update</button>
-    </form>
+    <input type="hidden" name="id" value="">
+
+    <button type="button" onclick="openPopup()" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-blue-600">Insert</button>
+    <button type="submit" name="update" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Update</button>
+</form>
+
+<div id="popup" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 z-50 overflow-y-auto">
+    <div class="relative bg-white max-w-md mx-auto mt-20 p-6 rounded-md shadow-lg">
+        <h2 class="text-lg font-semibold mb-4">Insert Officers</h2>
+        <form action="" method="post" enctype="multipart/form-data">
+            <input type="text" name="name" placeholder="Enter name" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
+            <input type="text" name="grade" placeholder="Grade" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
+            <input type="text" name="section" placeholder="Section" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
+            <input type="text" name="motto" placeholder="Motto" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
+            <input type="file" name="image" accept="image/*" class="border border-gray-300 rounded-md px-4 py-2 mb-2">
+           <select name="officer" id="officer" class="border border-gray-300 rounded-md px-4 py-2 mb-2" onchange="updateButton()">
+                <option value="President">President</option>
+                <option value="Vice President">Vice President</option>
+                <option value="PIO">PIO</option>
+                <option value="Secretary">Secretary</option>
+                <option value="Auditor">Auditor</option>
+                <option value="Treasurer">Treasurer</option>
+                <option value="Author">Author</option>
+                <option value="Protocol officers">Protocol officers</option>
+                <option value="Representative">Representative</option>
+            </select>
+           <button type="submit" name="insert" id="insertButton" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-blue-600">Insert</button>
+
+            <button type="button" onclick="closePopup()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">Close</button>
+        </form>
+    </div>
+</div>
+
+<script>
+     function openPopup() {
+        document.getElementById('popup').classList.remove('hidden');
+    }
+
+    function closePopup() {
+        document.getElementById('popup').classList.add('hidden');
+    }
+
+    function updateButton() {
+        var officer = document.getElementById('officer').value;
+        var insertButton = document.getElementById('insertButton');
+
+        if (officer === 'Representative') {
+            insertButton.innerText = 'Next';
+        } else {
+            insertButton.innerText = 'Insert';
+        }
+    }
+</script>
+
     <?php foreach ($groupedVoters as $officer => $voters): ?>
         <h2 class="text-xl font-bold mb-4"><?php echo $officer; ?></h2>
        <div class="text-gray-700 mb-4">
@@ -252,9 +288,9 @@ foreach ($groupedVoters as $officer => $officerVoters) {
                         <td class="py-2 px-4 border-b"><?php echo $voter['officer']; ?></td>
                         <td class="py-2 px-4 border-b"><?php echo $voter['grade']; ?></td>
                         <td class="py-2 px-4 border-b"><?php echo $voter['section']; ?></td>
-                        
+                       
                         <td class="py-2 px-4 border-b"><?php echo $voter['vote_counter']; ?></td>
-      <td class="px-4 py-2 border-b">
+                        <td class="px-4 py-2 border-b">
                             <?php
                             $officer = $voter['officer'];
                             $totalVotes = isset($totalOfficerVotes[$officer]) ? $totalOfficerVotes[$officer] : 0;
@@ -287,16 +323,7 @@ foreach ($groupedVoters as $officer => $officerVoters) {
             </tbody>
         </table>
     <?php endforeach; ?>
-    <!-- <script>
-    function setEditId() {
-        // Get the ID of the voter to edit
-        let editId = document.getElementById('editId');
-        let voterId = prompt("Enter the ID of the voter to edit:");
-        if (voterId) {
-            editId.value = voterId;
-        }
-    }
-</script> -->
+ 
 </body>
 
 </html>
